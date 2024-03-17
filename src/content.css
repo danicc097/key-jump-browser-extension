@@ -32,10 +32,21 @@
   border: 1px solid var(--KEYJUMP-color-border);
   border-radius: 2px;
   box-shadow: var(--KEYJUMP-shadow-highlight), var(--KEYJUMP-shadow-drop);
-  font: 13px/1 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font: 10px/1 Helvetica, Arial, sans-serif;
   letter-spacing: 1px;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
   white-space: nowrap;
+}
+
+.KEYJUMP_hint::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -3px;
+  margin-top: -3px;
+  border-width: 3px 0 3px 3px;
+  border-style: solid;
+  border-color: transparent transparent transparent var(--KEYJUMP-color-border);
 }
 
 .KEYJUMP_filtered .KEYJUMP_hint {

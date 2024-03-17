@@ -106,7 +106,7 @@ function handleKeydown(event) {
     if (event.key === 'Escape') {
       handleEscapeKey(event)
     } else {
-      const allowedQueryCharacters = '1234567890'
+      const allowedQueryCharacters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
       if (allowedQueryCharacters.includes(event.key)) {
         handleQueryKey(event)
@@ -180,50 +180,45 @@ function handleEscapeKey(event) {
     deactivateHintMode()
   }
 }
-
 function handleQueryKey(event) {
-  // Don't allow leading 0 in query.
-  if (state.query === '' && event.key === '0') {
-    return
-  }
+  stopKeyboardEvent(event);
 
-  stopKeyboardEvent(event)
+  const newQuery = state.query + event.key;
+  const hints = state.hints.map(hint => hint.id.toLowerCase());
 
-  const newQuery = state.query + event.key
-  const newQueryAsInt = parseInt(newQuery)
-  const newMatch = state.hints[newQueryAsInt - 1]
+  const newMatchIndex = hints.findIndex(hintId => hintId.startsWith(newQuery.toLowerCase()));
 
-  if (newMatch) {
-    state.query = newQuery
-    state.matchingHint = newMatch
+  if (newMatchIndex !== -1) {
+    state.query = newQuery;
+    state.matchingHint = state.hints[newMatchIndex];
 
-    filterHints()
+    filterHints();
 
-    if (
-      state.options.autoTrigger &&
-      // Now we check if it's possible to match another hint by appending
-      // another digit to the query. For example if the query is 1 and there are
-      // 15 hints then you could match hints 10-15 by appending 0-5 to the
-      // query.
-      //
-      // To do the check we first multiply the query with 10 because that will
-      // append a 0 to the end of the query, the lowest number that can be
-      // appended. Then we check if there are fewer hints than the new query, in
-      // which case no more matches can be made and we can autotrigger the
-      // current match.
-      //
-      // Assume that there are 15 hints, then:
-      // * Query = 1, Query * 10 = 10, and since 10 is less than 15 we know that
-      //   you could match hints 10-15 by appending 0-5 to the query.
-      // * Query = 2, Query * 10 = 20, and since 20 is more than 15 we know that
-      //   you can't match any other hints by appending another digit to the
-      //   query.
-      state.hints.length < newQueryAsInt * 10
-    ) {
-      triggerMatchingHint()
+    if (state.options.autoTrigger && state.hints.length < newQuery.length * 26) {
+      triggerMatchingHint();
+    }
+  } else {
+    // Handle the scenario when reaching 'z' and then appending again from 'a'
+    if (event.key === 'z') {
+      const firstChar = allowedQueryCharacters.charAt(0);
+      const newQueryWithFirstChar = state.query + firstChar;
+      const newMatchIndexWithFirstChar = hints.findIndex(hintId => hintId.startsWith(newQueryWithFirstChar.toLowerCase()));
+
+      if (newMatchIndexWithFirstChar !== -1) {
+        state.query = newQueryWithFirstChar;
+        state.matchingHint = state.hints[newMatchIndexWithFirstChar];
+
+        filterHints();
+
+        if (state.options.autoTrigger && state.hints.length < newQueryWithFirstChar.length * 26) {
+          triggerMatchingHint();
+        }
+      }
     }
   }
 }
+
+
 
 function triggerMatchingHint() {
   // Stop refreshing before triggering because the triggering could cause a
@@ -232,7 +227,7 @@ function triggerMatchingHint() {
   state.removeRefreshHintsEventListeners()
 
   const {
-    matchingHint: {targetEl},
+    matchingHint: { targetEl },
     openInNewTab,
   } = state
 
@@ -247,7 +242,7 @@ function triggerMatchingHint() {
       targetEl.getAttribute('href')
     ) {
       console.log(`@@@ send message`)
-      _browser.runtime.sendMessage({openUrlInNewTab: targetEl.href})
+      _browser.runtime.sendMessage({ openUrlInNewTab: targetEl.href })
     } else {
       const mouseEvent = new MouseEvent('click', {
         view: window,
@@ -351,7 +346,7 @@ function shouldElementBeFocused(el) {
 function clearFilterFromHints() {
   state.renderCache.containerEl.classList.remove(classNames.filtered)
 
-  for (const {hintEl} of state.hints) {
+  for (const { hintEl } of state.hints) {
     hintEl.classList.remove(classNames.match)
   }
 }
@@ -387,18 +382,55 @@ function findHints() {
     ].join(','),
   )
 
-  let hintId = 1
 
   state.hints = []
+  const a = 97
+  const z = 122
+  // 17576 combinations is probably enough...
+  let hintId1 = a;
+  let hintId2 = a;
+  let hintId3 = a;
+  let totalHints = targetEls.length;
+  let hintLength;
+
+  if (totalHints <= 26) {
+    hintLength = 1;
+  } else if (totalHints <= 26 * 26) {
+    hintLength = 2;
+  } else {
+    hintLength = 3;
+  }
 
   for (const el of targetEls) {
-    if (isElementVisible(el)) {
-      state.hints.push({
-        id: String(hintId),
-        targetEl: el,
-      })
+    let hint;
+    if (hintLength === 1) {
+      hint = String.fromCharCode(hintId1);
+      hintId1++;
+    } else if (hintLength === 2) {
+      hint = String.fromCharCode(hintId1) + String.fromCharCode(hintId2);
+      hintId2++;
+      if (hintId2 > z) {
+        hintId2 = a;
+        hintId1++;
+      }
+    } else {
+      hint = String.fromCharCode(hintId1) + String.fromCharCode(hintId2) + String.fromCharCode(hintId3);
+      hintId3++;
+      if (hintId3 > z) {
+        hintId3 = a;
+        hintId2++;
+        if (hintId2 > z) {
+          hintId2 = a;
+          hintId1++;
+        }
+      }
+    }
 
-      hintId++
+    if (isElementVisible(el)) { // for deterministic hints during scroll, compute the above for all page elements
+      state.hints.push({
+        id: hint,
+        targetEl: el,
+      });
     }
   }
 }
@@ -412,7 +444,7 @@ function renderHints() {
     setupRendering()
   }
 
-  const {renderCache: cache} = state
+  const { renderCache: cache } = state
 
   const fragment = document.createDocumentFragment()
   const winHeight = document.documentElement.clientHeight
@@ -480,7 +512,7 @@ function refreshHintsFactory() {
 }
 
 function delayedCleanupFactory() {
-  const {hints} = state
+  const { hints } = state
 
   return function delayedCleanup() {
     state.renderCache.containerEl.removeEventListener(
@@ -581,7 +613,7 @@ function setupRendering() {
 }
 
 function removeHints(hints) {
-  for (const {hintEl} of hints) {
+  for (const { hintEl } of hints) {
     hintEl.parentNode.removeChild(hintEl)
   }
 }
