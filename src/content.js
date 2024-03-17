@@ -314,6 +314,8 @@ function deactivateHintMode() {
   state.hints = []
   state.query = ''
   state.matchingHint = null
+
+  clearFilterFromHints()
 }
 
 function filterHints() {
