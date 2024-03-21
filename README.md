@@ -2,12 +2,25 @@
 
 No mouse needed to click on links and stuff.
 
+**FORK UPDATES:**
+- Letter based. Numbers are just... not good.
+- Arrow pointing to interactive element.
+- Deterministic naming when scrolling.
+
+![Example](.github/key-jump.gif)
+
 ## Get the extension
 
-- **[Chrome](https://chrome.google.com/webstore/detail/key-jump-keyboard-navigat/afdjhbmagopjlalgcjfclkgobaafamck)**
-- **[Firefox](https://addons.mozilla.org/en-US/firefox/addon/key-jump-keyboard-navigation/)**
-- **[Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/key-jump-keyboard-navigation/faeejgeaoefhcdlkpkgnlchbbncbmpid)**
+Install as unpacked. If you are interested in publishing, be my guest.
 
+~~-
+**[Chrome](https://chrome.google.com/webstore/detail/key-jump-keyboard-navigat/afdjhbmagopjlalgcjfclkgobaafamck)**~~
+
+~~-
+**[Firefox](https://addons.mozilla.org/en-US/firefox/addon/key-jump-keyboard-navigation/)**~~
+
+~~- **[Microsoft
+Edge](https://microsoftedge.microsoft.com/addons/detail/key-jump-keyboard-navigation/faeejgeaoefhcdlkpkgnlchbbncbmpid)**~~
 ## How to use
 
 Press `,` (comma) on your keyboard to show hints for all links, buttons, text fields and other things you can click or focus.
