@@ -55,9 +55,9 @@ function processOptions(options) {
       altKey: false,
       metaKey: false,
     },
-    autoTrigger: true,
+    autoTrigger: false,
     activateNewTab: true,
-    ignoreWhileInputFocused: true,
+    ignoreWhileInputFocused: false,
   }
 
   let saveOptions = false
