@@ -149,6 +149,8 @@ function eventHasModifierKey(event) {
   return !!(event.shiftKey || event.ctrlKey || event.altKey || event.metaKey)
 }
 
+const alphabetLength = 26
+
 function handleActivationKey(event) {
   const isNewTabActivationShortcut = doesEventMatchShortcut(
     event,
@@ -180,41 +182,29 @@ function handleEscapeKey(event) {
     deactivateHintMode()
   }
 }
+
 function handleQueryKey(event) {
   stopKeyboardEvent(event);
 
   const newQuery = state.query + event.key;
-  const hints = state.hints.map(hint => hint.id.toLowerCase());
+  const filteredHints = state.hints.filter(hint => hint.id.startsWith(newQuery.toLowerCase()));
 
-  const newMatchIndex = hints.findIndex(hintId => hintId.startsWith(newQuery.toLowerCase()));
-
-  if (newMatchIndex !== -1) {
+  if (filteredHints.length === 1) {
     state.query = newQuery;
-    state.matchingHint = state.hints[newMatchIndex];
-
+    state.matchingHint = filteredHints[0];
+    console.log(JSON.stringify({matching: state.matchingHint}) );
     filterHints();
 
-    if (state.options.autoTrigger && state.hints.length < newQuery.length * 26) {
+    if (state.options.autoTrigger) {
       triggerMatchingHint();
     }
+  } else if (filteredHints.length > 0) {
+    state.query = newQuery;
+    state.matchingHint = state.hints;
+    console.log({ filteredHints });
+    filterHints();
   } else {
-    // Handle the scenario when reaching 'z' and then appending again from 'a'
-    if (event.key === 'z') {
-      const firstChar = allowedQueryCharacters.charAt(0);
-      const newQueryWithFirstChar = state.query + firstChar;
-      const newMatchIndexWithFirstChar = hints.findIndex(hintId => hintId.startsWith(newQueryWithFirstChar.toLowerCase()));
-
-      if (newMatchIndexWithFirstChar !== -1) {
-        state.query = newQueryWithFirstChar;
-        state.matchingHint = state.hints[newMatchIndexWithFirstChar];
-
-        filterHints();
-
-        if (state.options.autoTrigger && state.hints.length < newQueryWithFirstChar.length * 26) {
-          triggerMatchingHint();
-        }
-      }
-    }
+    console.log('No matching hints.');
   }
 }
 
@@ -395,9 +385,9 @@ function findHints() {
   let totalHints = targetEls.length;
   let hintLength;
 
-  if (totalHints <= 26) {
+  if (totalHints <= alphabetLength) {
     hintLength = 1;
-  } else if (totalHints <= 26 * 26) {
+  } else if (totalHints <= alphabetLength * alphabetLength) {
     hintLength = 2;
   } else {
     hintLength = 3;
