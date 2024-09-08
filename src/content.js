@@ -136,7 +136,7 @@ function doesEventMatchShortcut(event, shortcut) {
 }
 
 function shouldMatchingHintBeTriggered(event) {
-  return !!(event.key === 'Enter' && state.matchingHint)
+  return !!(['Enter', " "].includes(event.key) && state.matchingHint)
 }
 
 function stopKeyboardEvent(event) {
