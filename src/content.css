@@ -1,7 +1,7 @@
 :root {
   --KEYJUMP-color-text: #fff;
-  --KEYJUMP-color-bg: #ee5757;
-  --KEYJUMP-color-border: #bb2424;
+  --KEYJUMP-color-bg: #0444a5;
+  --KEYJUMP-color-border: #fff;
 
   --KEYJUMP-shadow-highlight: inset rgba(255, 255, 255, 0.35) 0 1px 0;
   --KEYJUMP-shadow-drop: rgba(0, 0, 0, 0.28) 0 1px 2px;
@@ -32,7 +32,8 @@
   border: 1px solid var(--KEYJUMP-color-border);
   border-radius: 2px;
   box-shadow: var(--KEYJUMP-shadow-highlight), var(--KEYJUMP-shadow-drop);
-  font: 1rem/1 Helvetica, Arial, sans-serif;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 0.8rem; 
   letter-spacing: 1px;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
   white-space: nowrap;
@@ -42,9 +43,9 @@
   content: '';
   position: absolute;
   top: 50%;
-  right: -3px;
-  margin-top: -3px;
-  border-width: 3px 0 3px 3px;
+  right: -6px;
+  margin-top: -6px;
+  border-width: 6px 0 6px 6px;
   border-style: solid;
   border-color: transparent transparent transparent var(--KEYJUMP-color-border);
 }
